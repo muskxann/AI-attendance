@@ -47,7 +47,7 @@ def style_layout():
                 font-size: 3.5rem !important;
                 line-height:1.1rem !important;
                 margin-bottom:0rem !important;
-                color: #3c2857 !important;
+                color: #e5cbd8 !important;
             }
 
             h3,h4,p{
@@ -66,12 +66,9 @@ def home_button():
                 height: 300px;
                 width: 300px;
                 border-radius: 5% !important;
-                font-family: "Karla", serif !important;
-                font-size: 5.5rem !important;
                 background: rgba(255, 255, 255, 0.15) !important; 
                 backdrop-filter: blur(10px) !important;
                 border: 1px solid rgba(255, 255, 255, 0.25) !important;
-                color: #3c2857; !important;
                 cursor: pointer;
                 box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
                 transition: all 0.3s ease !important;
@@ -89,7 +86,8 @@ def home_button():
             [data-testid="stButton"] button p {
                 font-family: 'Karla', sans-serif;
                 font-size: 24px !important;    
-                font-weight: 600 !important;   
+                font-weight: 600 !important; 
+                color: #ceb7e1 !important;  
             }
 
         </style>
@@ -103,11 +101,9 @@ def dashboard_button():
                 padding-top:50px;
                 border-radius: 15px !important;
                 font-family: "Karla", serif !important;
-                font-size: 5.5rem !important;
                 background: rgba(255, 255, 255, 0.15) !important; 
                 backdrop-filter: blur(10px) !important;
                 border: 1px solid rgba(255, 255, 255, 0.25) !important;
-                color: #ffffff !important;
                 cursor: pointer;
                 box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
                 transition: all 0.3s ease !important;
@@ -124,6 +120,7 @@ def dashboard_button():
 
             [data-testid="stButton"] button p {
                 font-family: 'Karla', sans-serif;
+                color: #3c2857 !important;
             }
             
 

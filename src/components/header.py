@@ -7,7 +7,7 @@ def header_home():
     st.markdown("""
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&icon_names=school" />
         <div style="display:flex; flex-direction:column; justify-content:center; align-items:center; height:200px">
-            <span class="material-symbols-outlined" style="transform: scale(4); color:#3c2857; margin-bottom:30px;">school</span>
+            <span class="material-symbols-outlined" style="transform: scale(4); color:#e5cbd8; margin-bottom:30px;">school</span>
             <h1>Smart Attendance</h1>
         </div>
     """, unsafe_allow_html=True)
