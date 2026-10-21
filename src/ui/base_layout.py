@@ -32,7 +32,7 @@ def style_layout():
             }
 
             .block-container{
-                padding-top: 1.5 rem !important;
+                padding-top: 0rem;
             }
 
             h2{

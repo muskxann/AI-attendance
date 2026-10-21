@@ -55,9 +55,6 @@ def get_all_subjects(teacher_id):
         unique_sessions = len(set(log['timestamp'] for log in attendance))
         subject['total_class'] = unique_sessions
 
-    subjects.pop('subject_students', None)
-    subjects.pop('attendance_logs', None)
-
     return subjects
 
 

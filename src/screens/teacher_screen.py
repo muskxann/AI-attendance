@@ -1,8 +1,9 @@
 import streamlit as st
 from src.components.header import header_dashboard
-from src.components.create_subject_dialogue import create_subject
+from src.components.create_subject_dialogue import create_subject, share_subject
 from src.database.db import check_teacher_exists, create_teacher, teacher_login, get_all_subjects
 from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout, style_layout, container_layout
+from src.components.subject_card import subject_card
 
 def teacher_screen():
     background_dashboard()
@@ -14,8 +15,9 @@ def teacher_screen():
     if 'teacher_login' not in st.session_state:
         st.session_state['teacher_login'] = 'register'
 
-    if "teacher_data" in st.session_state:
-            teacher_dashboard()
+    if st.session_state.get("teacher_data") is not None:
+        teacher_dashboard()
+        
     else:
         match st.session_state['teacher_login']:
             case 'login':
@@ -46,7 +48,7 @@ def teacher_dashboard():
             st.session_state.teacher_data = None
             st.rerun()
 
-    st.space()
+    st.divider()
 
     if "current_teacher_tab" not in st.session_state:
         st.session_state.current_teacher_tab = 'take_attendance'
@@ -92,15 +94,15 @@ def manage_subjects():
     
     subject = get_all_subjects(teacher_id)
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2, gap='xlarge')
     with col1:
         st.header("Manage Subjects")
     with col2:
         if st.button("Create new subjects", width='stretch', type='secondary'):
-            create_subject()
+            create_subject(teacher_id)
             
     with st.container(border=True, key='styled'):
-        if not st.session_state.teacher_data.get('subject_id'):
+        if not subject:
             st.info("There is no subject to show, create new subject")
         for sub in subject:
             stats = [
@@ -108,21 +110,19 @@ def manage_subjects():
                 ("Students", sub['total_students']),
             ]
 
-            def share_btn():
-                if st.button(f"Share code:{sub['subject_name']}", key=f"share_{sub['subject_code']}", type='secondary'):
-                    share_subject_dialog(sub['subject_name'], sub["subject_code"])
-                st.space()
-
-        subject_card(
-            code = sub['subject_code'],
-            name = sub['subject_name'],
-            section =  sub['section'],
-            stats = stats,
-            footer_clb = share_btn()
-        )
+            subject_card(
+                code = sub['subject_code'],
+                name = sub['subject_name'],
+                section =  sub['section'],
+                stats = stats,
+                footer_clb = share_btn(sub)
+            )
 
 
-
+def share_btn(sub):
+    if st.button(f"Share code:{sub['subject_name']}", key=f"share_{sub['subject_code']}", type='primary'):
+        share_subject(sub['subject_name'], sub["subject_code"])
+    st.space()
 
 def attendance_records():
     st.header("Check Attendance Records")
@@ -185,7 +185,7 @@ def register_screen():
                     import time
                     time.sleep(2)
                     st.session_state['teacher_login'] = 'login'
-                    st.rerun
+                    st.rerun()
                 else:
                     st.error(message)
             
