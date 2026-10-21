@@ -33,11 +33,11 @@ def get_trained_model():
 
     student_db = get_all_students()
 
-    if not student_db():
+    if not student_db:
         return None
 
     for student in student_db:
-        embedding = student.get["face_embedding"]
+        embedding = student.get("face_embedding")
 
     if embedding:
         X.append(np.array(embedding))

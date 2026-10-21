@@ -97,8 +97,27 @@ def home_button():
 def dashboard_button():
     st.markdown("""
         <style>
-            button{
-                padding-top:50px;
+            button[kind='primary']{
+                border:0px !important;
+                border-radius: 15px !important;
+                font-family: "Karla", serif !important;
+                background: #3c2857 !important; 
+                cursor: pointer;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
+                transition: all 0.3s ease !important;
+            }
+
+            button[kind='primary']:hover{
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
+                transform: translateY(-2px);
+            }
+
+            [data-testid="stButton"] button[kind='primary'] p {
+                font-family: 'Karla', sans-serif;
+                color: #e5cbd8 !important;
+            }
+
+            button[kind='secondary']{
                 border-radius: 15px !important;
                 font-family: "Karla", serif !important;
                 background: rgba(255, 255, 255, 0.15) !important; 
@@ -109,7 +128,7 @@ def dashboard_button():
                 transition: all 0.3s ease !important;
             }
 
-            button:hover{
+            button[kind='secondary']:hover{
                 border: 1px !important;
                 border-color: white;
                 background: rgba(255, 255, 255, 0.25) !important;
@@ -118,11 +137,30 @@ def dashboard_button():
                 transform: translateY(-2px);
             }
 
-            [data-testid="stButton"] button p {
+            [data-testid="stButton"] button[kind='secondary'] p {
                 font-family: 'Karla', sans-serif;
                 color: #3c2857 !important;
             }
-            
+
+            button[kind='tertiary']{
+                border:0px !important;
+                border-radius: 15px !important;
+                font-family: "Karla", serif !important;
+                background: #e5cbd8 !important; 
+                cursor: pointer;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
+                transition: all 0.3s ease !important;
+            }
+
+            button[kind='tertiary']:hover{
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
+                transform: translateY(-2px);
+            }
+
+            [data-testid="stButton"] button[kind='tertiary'] p {
+                font-family: 'Karla', sans-serif;
+                color: #3c2857 !important;
+            }
 
         </style>
     """
@@ -141,3 +179,16 @@ def text_input_layout():
             }
         </style>
         """, unsafe_allow_html=True)
+
+def container_layout():
+    st.markdown("""
+        <style>
+            .st-key-styled{
+                background: #e5cbd8; 
+                border-radius: 25px;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
+            }
+            div[data-testid="stCameraInput"] button {
+                color: #3c2857 !important; 
+            }
+        </style>""", unsafe_allow_html=True)

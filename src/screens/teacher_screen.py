@@ -1,14 +1,16 @@
 import streamlit as st
 from src.components.header import header_dashboard
-from src.database.db import check_teacher_exists, create_teacher, teacher_login
-from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout, style_layout
+from src.components.create_subject_dialogue import create_subject
+from src.database.db import check_teacher_exists, create_teacher, teacher_login, get_all_subjects
+from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout, style_layout, container_layout
 
 def teacher_screen():
     background_dashboard()
     dashboard_button()
     text_input_layout()
     style_layout()
-    
+    container_layout()
+
     if 'teacher_login' not in st.session_state:
         st.session_state['teacher_login'] = 'register'
 
@@ -26,7 +28,104 @@ def teacher_screen():
 
 def teacher_dashboard():
     teacher_data = st.session_state.teacher_data
-    st.header(f"Welcome, {teacher_data["name"]}")
+    background_dashboard()
+    dashboard_button()
+    text_input_layout()
+    style_layout()
+
+    c1, c2 = st.columns(2, vertical_alignment='center', gap='xlarge')
+                
+    with c1:
+        header_dashboard()
+    with c2:
+        st.header(f"Welcome, {teacher_data['name']}")
+        if st.button("logout", width='stretch', shortcut='control+backspace'):
+            st.session_state['login_type']= None
+            st.session_state.is_logged_in = False
+            st.session_state.user_role = None
+            st.session_state.teacher_data = None
+            st.rerun()
+
+    st.space()
+
+    if "current_teacher_tab" not in st.session_state:
+        st.session_state.current_teacher_tab = 'take_attendance'
+
+    tab1, tab2, tab3 = st.columns(3)
+
+    with tab1:
+        type1 = 'secondary' if st.session_state.current_teacher_tab == 'take_attendance' else 'tertiary'
+        if st.button("Take attendance", width='stretch', type=type1):
+            st.session_state.current_teacher_tab = 'take_attendance'
+            st.rerun()
+    with tab2:
+        type2 = 'secondary' if st.session_state.current_teacher_tab == 'manage_subjects' else 'tertiary'
+        if st.button("Manage subjects", width='stretch', type=type2):
+            st.session_state.current_teacher_tab = 'manage_subjects'
+            st.rerun()
+    with tab3:
+        type3 = 'secondary' if st.session_state.current_teacher_tab == 'attendance_records' else 'tertiary'
+        if st.button("Attendance records", width='stretch', type=type3):
+            st.session_state.current_teacher_tab = 'attendance_records'
+            st.rerun()
+
+    st.divider()
+
+    if st.session_state.current_teacher_tab == 'take_attendance':
+        take_attendance()
+    if st.session_state.current_teacher_tab == 'manage_subjects':
+        manage_subjects()
+    if st.session_state.current_teacher_tab == 'attendance_records':
+        attendance_records()
+
+
+
+def take_attendance():
+    st.header("Take AI Attendance")
+
+
+
+def manage_subjects():
+    container_layout()
+    
+    teacher_id = st.session_state.teacher_data.get('teacher_id')
+    
+    subject = get_all_subjects(teacher_id)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("Manage Subjects")
+    with col2:
+        if st.button("Create new subjects", width='stretch', type='secondary'):
+            create_subject()
+            
+    with st.container(border=True, key='styled'):
+        if not st.session_state.teacher_data.get('subject_id'):
+            st.info("There is no subject to show, create new subject")
+        for sub in subject:
+            stats = [
+                ("Classes", sub['total_class']),
+                ("Students", sub['total_students']),
+            ]
+
+            def share_btn():
+                if st.button(f"Share code:{sub['subject_name']}", key=f"share_{sub['subject_code']}", type='secondary'):
+                    share_subject_dialog(sub['subject_name'], sub["subject_code"])
+                st.space()
+
+        subject_card(
+            code = sub['subject_code'],
+            name = sub['subject_name'],
+            section =  sub['section'],
+            stats = stats,
+            footer_clb = share_btn()
+        )
+
+
+
+
+def attendance_records():
+    st.header("Check Attendance Records")
     
 def register_teacher(teacher_username, teacher_name, teacher_password, confirm_password):
     if not teacher_username or not teacher_name or not teacher_password or not confirm_password:
@@ -57,22 +156,14 @@ def login_teacher(username, password):
 
 def register_screen(): 
 
-    st.markdown("""
-        <style>
-            .st-key-styled{
-                background: #e5cbd8; 
-                border-radius: 25px;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
-            }
-        </style>
+    container_layout()
 
-""", unsafe_allow_html=True)
     c1, c2 = st.columns(2, vertical_alignment='center', gap='xlarge')
             
     with c1:
         header_dashboard()
     with c2:
-        if st.button("Go back to home", width='stretch', shortcut='control+backspace'):
+        if st.button("Go back to home", width='stretch', shortcut='control+backspace', type='secondary'):
             st.session_state['login_type']= None
             st.rerun()
 
@@ -86,7 +177,7 @@ def register_screen():
         col1, col2 = st.columns(2, gap='xlarge')
 
         with col1:
-            if st.button("Register", width='stretch', shortcut='enter'):
+            if st.button("Register", width='stretch', shortcut='control+enter', type='primary'):
                 success, message = register_teacher(teacher_username, teacher_name, teacher_password, confirm_password)
 
                 if success:
@@ -99,26 +190,21 @@ def register_screen():
                     st.error(message)
             
         with col2:
-            if st.button("Login Instead", width='stretch'):
+            if st.button("Already a member? Login Instead", width='stretch', type='secondary'):
                 st.session_state['teacher_login']='login'
                 st.rerun() 
             
 
 def login_screen():
-    st.markdown("""
-            <style>
-                .st-key-styled{
-                    background: #e5cbd8;
-                    border-radius: 25px;
-                    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
-                }
-            </style>""", unsafe_allow_html=True)
+
+    container_layout()
+
     c1, c2 = st.columns(2, vertical_alignment='center', gap='xlarge')
         
     with c1:
         header_dashboard()
     with c2:
-        if st.button("Go back to home", width='stretch', shortcut='control+backspace'):
+        if st.button("Go back to home", width='stretch', shortcut='control+backspace', type='secondary'):
             st.session_state['login_type']= None
             st.rerun()
     
@@ -130,7 +216,7 @@ def login_screen():
         col1, col2 = st.columns(2, gap='xlarge')
 
         with col1:
-            if st.button("Login", width='stretch', shortcut='enter'):
+            if st.button("Login", width='stretch', shortcut='control+enter', type='primary'):
                 if login_teacher(teacher_username, teacher_password):
                     st.toast("Welcome back!")
                     import time
@@ -142,6 +228,6 @@ def login_screen():
         
 
         with col2:
-            if st.button("Register Instead", width='stretch'):
+            if st.button("New here? Register now", width='stretch', type='secondary'):
                 st.session_state['teacher_login']='register'
                 st.rerun()

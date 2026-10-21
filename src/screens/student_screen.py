@@ -2,7 +2,7 @@ import streamlit as st
 from src.components.header import header_dashboard
 from PIL import Image
 import numpy as np
-from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout
+from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout, style_layout, container_layout
 from src.pipelines.face_pipeline import predict_attendance, get_face_embeddings, train_classifier
 from src.pipelines.voice_pipeline import get_voice_embedding
 from src.database.db import get_all_students, create_student
@@ -11,34 +11,29 @@ def student_screen():
     background_dashboard()
     dashboard_button()
     text_input_layout()
-    show_registration = False
+    container_layout()
 
-    if "student_data" in st.session_state:
+    show_registration = False
+    
+    if (
+        st.session_state.get("is_logged_in", False)
+        and st.session_state.get("user_role") == "student"
+        and st.session_state.get("user_data") is not None
+    ):
         student_dashboard()
-        st.rerun()
+        st.stop()
+
 
     c1, c2 = st.columns(2, vertical_alignment='center', gap='xlarge')
         
     with c1:
         header_dashboard()
     with c2:
-        if st.button("Go back to home", width='stretch', shortcut='control+backspace'):
+        if st.button("Go back to home", width='stretch', shortcut='control+backspace', type='primary'):
             st.session_state['login_type']= None
             st.rerun()
 
-    st.markdown("""
-    <style>
-        .st-key-styled{
-            background: #e5cbd8; 
-            border-radius: 25px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.4) !important;
-        }
-        div[data-testid="stCameraInput"] button {
-            color: #3c2857 !important; 
-        }
-    </style>
-
-""", unsafe_allow_html=True)
+    
     
     with st.container(border=True, key='styled') : 
 
@@ -54,13 +49,19 @@ def student_screen():
 
             if num_faces==0:
                 st.warning("face not found!")
+                show_registration=True
             elif num_faces>1:
                 st.warning("multiple faces detected")
             else:
                 if detected:
                     student_id = list(detected.keys())[0]
-                    all_students = get_all_students
-                    student = next((s for s in all_students if s['student_id']==student_id), None)
+                    all_students = get_all_students()
+                    student = next(
+                    (s for s in all_students
+                        if str(s.get("student_id")) == str(student_id)
+                    ),
+                    None)
+                
                     if student:
                         st.session_state.is_logged_in = True
                         st.session_state.user_role = 'student' 
@@ -84,7 +85,7 @@ def student_screen():
                 audio_input = st.audio_input("Record a short phrase like I am present")
             except Exception:
                 st.error("Audio input error")
-            if st.button("Create Account"):
+            if st.button("Create Account", type='primary'):
                 if new_name:
                     with st.spinner("Creating Profile"):
                         img = np.array(Image.open(photo_source))
@@ -113,5 +114,22 @@ def student_screen():
 
 
 def student_dashboard():
-    st.header(f"Welcome, {st.session_state.user_data['name']}")
+    background_dashboard()
+    dashboard_button()
+    text_input_layout()
+    style_layout()
+    container_layout()
+
+    student = st.session_state.get("user_data")
+
+    st.header(f"Welcome, {student['name']}")
+
+    st.success("You are successfully logged in!")
+
+    if st.button("Logout", type='primary'):
+        st.session_state.is_logged_in = False
+        st.session_state.user_role = None
+        st.session_state.user_data = None
+        st.session_state['login_type'] = None
+        st.rerun()
 
