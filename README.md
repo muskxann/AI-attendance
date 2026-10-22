@@ -23,16 +23,17 @@ Traditional attendance systems often depend on manual roll calls, paper register
 
 **Smart Attendance** explores how artificial intelligence and biometric recognition can simplify this process.
 
-The application provides separate interfaces for teachers and students. Teachers can manage subjects, initiate AI-assisted attendance, and review attendance records. Students can enroll in courses, authenticate through the available identification workflows, and monitor their attendance statistics.
+The application provides separate interfaces for teachers and students. Teachers can manage subjects, share class links, initiate AI-assisted attendance, and review attendance records. Students can enroll in courses, access classes through shared links or QR codes, authenticate through the available identification workflows, and monitor their attendance statistics.
 
 The project integrates machine learning pipelines, biometric feature extraction, database operations, and an interactive web interface into one application.
 
-### Highlights
+### Project Highlights
 
 * Facial recognition using facial embeddings and a trained classifier.
 * Voice-based attendance using speaker embeddings.
 * Dedicated teacher and student portals.
 * Subject creation and enrollment.
+* Shareable class links and QR code generation.
 * Attendance records and student statistics.
 * Interactive Streamlit interface.
 * Modular code organization for UI, database operations, and AI pipelines.
@@ -45,7 +46,7 @@ The project integrates machine learning pipelines, biometric feature extraction,
 
 * **Registration and Login:** Create a teacher profile and authenticate.
 * **Subject Management:** Create subjects with subject codes and sections.
-* **Enrollment Codes:** Share subject codes with students.
+* **Class Sharing & QR Codes:** Generate shareable class links and QR codes so students can quickly access the class enrollment workflow.
 * **AI Attendance:** Select a subject and add photographs for attendance analysis.
 * **Voice Attendance:** Access the voice-based attendance workflow.
 * **Attendance Records:** Review recorded sessions, timestamps, subjects, and attendance statistics.
@@ -56,6 +57,7 @@ The project integrates machine learning pipelines, biometric feature extraction,
 * **Student Authentication:** Register and log in to the application.
 * **Face ID Login:** Access the facial identification workflow.
 * **Subject Enrollment:** Enroll in subjects using enrollment codes.
+* **Quick Class Access:** Open a shared class link or scan its QR code to access the class enrollment workflow.
 * **Enrolled Subjects:** View registered courses and their details.
 * **Attendance Statistics:** Track total classes and attended classes.
 * **Course Management:** Unenroll from subjects when necessary.
@@ -104,7 +106,7 @@ Teachers can create an account using their username, full name, and password.
 
 ### 3. Teacher Login
 
-Registered teachers can securely access the teacher portal using their credentials.
+Registered teachers can access the teacher portal using their credentials.
 
 ![Teacher Login](assets/login-teacher.png)
 
@@ -132,41 +134,41 @@ The student authentication interface provides access to the student portal.
 
 ![Student Login](assets/student-login.png)
 
-### 8. Face ID Login
-
-The facial identification interface provides a camera-based workflow for student identification.
-
-![Face ID Login](assets/student-login.png)
-
-### 9. Student Dashboard
+### 8. Student Dashboard
 
 Students can view enrolled subjects, course codes, sections, total classes, and attended classes.
 
 ![Student Dashboard](assets/student-dashboard.png)
 
-### 10. AI Attendance
+### 9. AI Attendance
 
 The AI attendance interface allows teachers to select a subject, add photographs, and initiate attendance analysis.
 
 ![AI Attendance](assets/ai-attendance.png)
 
-### 11. AI Analysis
+### 10. AI Analysis
 
 The AI analysis interface supports the facial recognition attendance workflow.
 
 ![AI Analysis](assets/ai-analysis.png)
 
-### 12. Voice Attendance
+### 11. Voice Attendance
 
 The application includes a separate workflow for voice-based attendance using speaker-related features.
 
 ![Voice Attendance](assets/voice-attendance.png)
 
-### 13. Database Integration
+### 12. Database Integration
 
 Database configuration and operations form part of the application's backend.
 
 ![Database Integration](assets/db.png)
+
+### 13. Share Class Link & QR Code
+
+Teachers can share a class link or display a QR code to help students access the class enrollment workflow.
+
+![Share Class Link with QR Code](assets/share-class-link.png)
 
 ---
 
@@ -249,38 +251,41 @@ flowchart TD
 
     C --> E[Subject Management]
     C --> F[Attendance Workflows]
+    C --> G[Class Sharing and QR Codes]
 
-    D --> G[Authentication]
-    D --> H[Subject Enrollment]
+    D --> H[Authentication]
+    D --> I[Subject Enrollment]
 
-    F --> I[Face Recognition Pipeline]
-    F --> J[Voice Recognition Pipeline]
+    F --> J[Face Recognition Pipeline]
+    F --> K[Voice Recognition Pipeline]
 
-    I --> K[Facial Embeddings and Classifier]
-    J --> L[Speaker Embeddings]
+    J --> L[Facial Embeddings and Classifier]
+    K --> M[Speaker Embeddings]
 
-    E --> M[Database Layer]
-    G --> M
-    H --> M
+    E --> N[Database Layer]
+    G --> N
+    H --> N
+    I --> N
 
-    K --> N[Attendance Processing]
-    L --> N
+    L --> O[Attendance Processing]
+    M --> O
 
-    N --> M
-    M --> O[Attendance Records and Statistics]
+    O --> N
+    N --> P[Attendance Records and Statistics]
 ```
 
 ### Main Components
 
-| Component           | Responsibility                                     |
-| ------------------- | -------------------------------------------------- |
-| Streamlit interface | Renders forms, buttons, pages, and dashboards      |
-| Teacher portal      | Subject and attendance management                  |
-| Student portal      | Authentication, enrollment, and attendance viewing |
-| Face pipeline       | Facial feature processing and classification       |
-| Voice pipeline      | Speaker embedding extraction                       |
-| Database layer      | Persistent application data operations             |
-| Attendance records  | Displays recorded sessions and statistics          |
+| Component             | Responsibility                                     |
+| --------------------- | -------------------------------------------------- |
+| Streamlit interface   | Renders forms, buttons, pages, and dashboards      |
+| Teacher portal        | Subject and attendance management                  |
+| Student portal        | Authentication, enrollment, and attendance viewing |
+| Class-sharing feature | Provides shareable class links and QR codes        |
+| Face pipeline         | Facial feature processing and classification       |
+| Voice pipeline        | Speaker embedding extraction                       |
+| Database layer        | Persistent application data operations             |
+| Attendance records    | Displays recorded sessions and statistics          |
 
 ---
 
@@ -325,7 +330,8 @@ AI-attendance/
 │   ├── ai-attendance.png
 │   ├── ai-analysis.png
 │   ├── voice-attendance.png
-│   └── db.png
+│   ├── db.png
+│   └── share-class-link.png
 │
 └── src/
     ├── components/
@@ -425,7 +431,7 @@ Open the local address displayed in your terminal to access the application.
 
 ## ⚙️ Configuration
 
-Before using the application, verify the following:
+Before using the application, verify the following.
 
 ### Database
 
@@ -458,19 +464,21 @@ Specific setup requirements depend on the implementation and configuration files
 
 1. Register or log in to the teacher portal.
 2. Create a subject with its code and section.
-3. Share the enrollment code with students.
-4. Select a subject for attendance.
-5. Add photographs or use the voice attendance workflow.
-6. Initiate the corresponding attendance process.
-7. Review attendance records and statistics.
+3. Generate a shareable class link or QR code.
+4. Share the enrollment details with students.
+5. Select a subject for attendance.
+6. Add photographs or use the voice attendance workflow.
+7. Initiate the corresponding attendance process.
+8. Review attendance records and statistics.
 
 ### Student Workflow
 
 1. Register or log in to the student portal.
-2. Enroll in subjects using their enrollment codes.
-3. View enrolled courses on the dashboard.
-4. Use the available facial identification workflow when required.
-5. Review attendance statistics for enrolled subjects.
+2. Open a shared class link or scan its QR code to access the enrollment workflow.
+3. Enroll in subjects using their enrollment codes when required.
+4. View enrolled courses on the dashboard.
+5. Use the available facial identification workflow when required.
+6. Review attendance statistics for enrolled subjects.
 
 ### Attendance Records
 
@@ -499,7 +507,7 @@ Recommended practices include:
 * **Retention:** Establish clear policies for deleting biometric information.
 * **Secure deployment:** Use encrypted connections and appropriate access controls.
 
-Facial and speaker embeddings should be treated as sensitive biometric data even when they are stored as numerical representations.
+Facial and speaker embeddings should be treated as sensitive biometric data even when stored as numerical representations.
 
 These are recommended safeguards, not claims that every control is already implemented.
 
