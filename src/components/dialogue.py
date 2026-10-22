@@ -1,8 +1,9 @@
 import streamlit as st
-from src.database.db import add_subjects
+from src.database.db import add_subjects, enroll_student_to_subject
 from src.ui.base_layout import dashboard_button, text_input_layout
 import segno
 import io
+from src.database.config import supabase
 
 @st.dialog("Create New Subject")
 def create_subject(teacher_id):
@@ -41,3 +42,27 @@ def share_subject(subject_name, subject_code):
     with col2:
         st.write("Scan to join")
         st.image(out.getvalue(), caption="QR code to join the class")
+
+@st.dialog("Enroll in a New Class")
+def enroll_dialog():
+    st.write("Join using subject code")
+    join_code = st.text_input("subject code", placeholder='E.g. 101')
+    if st.button("Enroll now", type='primary', width='stretch'):
+        if not join_code:
+            st.warning("Enter a valid code")
+        else:
+            res = supabase.table('subjects').select('subject_id', 'subject_code', 'subject_name').eq('subject_code', join_code).execute()
+            if res.data:
+                subject_data= res.data[0]
+                student_id = st.session_state.user_data['student_id']
+                check = supabase.table('subject_students').select('*').eq('student_id', student_id).eq('subject_id', subject_data['subject_id']).execute()
+                if check.data:
+                    st.warning("You are already enrolled")
+                else:
+                    enroll_student_to_subject(student_id,subject_data['subject_id'])
+                    st.success('Successfully Enrolled')
+                    import time
+                    time.sleep(1)
+                    st.rerun()
+
+        

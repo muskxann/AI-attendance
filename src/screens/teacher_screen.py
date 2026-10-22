@@ -1,6 +1,6 @@
 import streamlit as st
 from src.components.header import header_dashboard
-from src.components.create_subject_dialogue import create_subject, share_subject
+from src.components.dialogue import create_subject, share_subject
 from src.database.db import check_teacher_exists, create_teacher, teacher_login, get_all_subjects
 from src.ui.base_layout import background_dashboard, dashboard_button, text_input_layout, style_layout, container_layout
 from src.components.subject_card import subject_card

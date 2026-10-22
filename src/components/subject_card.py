@@ -9,10 +9,10 @@ def subject_card(code,name,section,stats=None,footer_clb=None):
         col1, col2 = st.columns(2)
         with col1:
             st.write(f"Code:{code}")
-            st.write(f'Classes:{stats[0][1]}')
+            st.write(f'{stats[0][0]}:{stats[0][1]}')
         with col2:
             st.write(f"Section:{section}")
-            st.write(f'Students:{stats[1][1]}')
+            st.write(f'{stats[1][0]}:{stats[1][1]}')
 
     with st.container():
         if footer_clb:
