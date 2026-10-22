@@ -31,7 +31,7 @@ def student_screen():
     with c1:
         header_dashboard()
     with c2:
-        if st.button("Go back to home", width='stretch', shortcut='control+backspace', type='primary'):
+        if st.button("Go back to home", width='stretch', shortcut='control+backspace', type='primary', icon=':material/home:'):
             st.session_state['login_type']= None
             st.rerun()
 
@@ -130,7 +130,7 @@ def student_dashboard():
         header_dashboard()
     with col2:
         st.header(f"Welcome, {student['name']}")
-        if st.button("Logout", type='primary', width='stretch'):
+        if st.button("Logout", type='primary', width='stretch', icon=':material/logout:'):
             st.session_state.is_logged_in = False
             st.session_state.user_role = None
             st.session_state.user_data = None

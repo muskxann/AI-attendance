@@ -88,3 +88,7 @@ def get_attendance_logs(student_id):
 def get_enrolled_subjects(student_id):
     response = supabase.table('subject_students').select('*, subjects(*)').eq('student_id', student_id).execute()
     return response.data
+
+def add_attendance(log):
+    res = supabase.table('attendance_logs').insert(log).execute()
+    return res.data
