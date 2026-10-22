@@ -52,7 +52,7 @@ def get_all_subjects(teacher_id):
     for subject in subjects:
         subject["total_students"] = subject.get("subject_students", [{}])[0].get('count', 0) if subject.get('subject_students') else 0
         attendance = subject.get('attendance_logs',[])
-        unique_sessions = len(set(log['timestamp'] for log in attendance))
+        unique_sessions = len(set(log['timestamps'] for log in attendance))
         subject['total_class'] = unique_sessions
 
     return subjects
@@ -92,3 +92,7 @@ def get_enrolled_subjects(student_id):
 def add_attendance(log):
     res = supabase.table('attendance_logs').insert(log).execute()
     return res.data
+
+def get_attendance_for_teacher(teacher_id):
+    response = supabase.table('attendance_logs').select("*, subjects!inner(*)").eq('subjects.teacher_id', teacher_id).execute()
+    return response.data 

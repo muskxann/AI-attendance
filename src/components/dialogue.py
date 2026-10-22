@@ -1,10 +1,13 @@
 import streamlit as st
 from src.database.db import add_subjects, enroll_student_to_subject, add_attendance
 from src.ui.base_layout import dashboard_button, text_input_layout
+from src.pipelines.voice_pipeline import process_bulk_audio
 import segno
 import io
+import pandas as pd
 from PIL import Image
 from src.database.config import supabase
+from datetime import datetime
 
 @st.dialog("Create New Subject")
 def create_subject(teacher_id):
@@ -154,8 +157,77 @@ def attendance_result_dialog(df, log):
             try:
                 add_attendance(log)
                 st.toast("Successfully logged attendance")
+                st.session_state.attendance_images = []
+                st.rerun()
             except Exception as e:
                 st.error("Data inserting error")
+            
     with col2:
         if st.button("Discard", type='tertiary', width='stretch'):
+            st.session_state.attendance_images = []
             st.rerun()
+
+@st.dialog("Voice Attendance")
+def voice_attendance_dialog(subject_id):
+    st.info("Record audio of students saying I am present then AI will recognise the students")
+    audio = st.audio_input("Record Classroom Audio")
+    if st.button("Analyze Audio"):
+        with st.spinner("Processing Audio data"):
+            res = supabase.table('subject_students').select('*, students(*)').eq('subject_id',subject_id).execute()
+            enrolled_students = res.data
+            if not enrolled_students:
+                st.warning("No students are enrolled in this course")
+                return
+            candidates_dict = {
+                s["students"]['student_id'] : s['students']['voice_embedding']
+                for s in enrolled_students if s['students'].get('voice_embedding')
+            }
+            if not candidates_dict:
+                st.warning("No enrolled students have voice profiles registered")
+                return
+            audio_bytes = audio.read()
+            detected_scores = process_bulk_audio(audio_bytes, candidates_dict)
+
+            results, attendance_to_log = [],[]
+            current_timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+
+            for node in enrolled_students:
+                student = node['students']
+                scores = detected_scores.get(student['student_id'], 0.0)
+                is_present=bool(scores)
+                results.append({
+                    "Name":student['name'],
+                    "ID":student['student_id'],
+                    "Score":scores if is_present else "-",
+                    "Status":"Present" if is_present else "Absent"
+                })
+                attendance_to_log.append({
+                    'student_id':student['student_id'],
+                    'subject_id':subject_id,
+                    'timestamps':current_timestamp,
+                    'is_present':bool(is_present)
+                })
+            st.session_state.voice_attendance_results = (pd.DataFrame(results), attendance_to_log)    
+
+            if st.session_state.voice_attendance_results is not None:
+                st.divider()
+                st.write("Please review attendance before confirming")
+                st.dataframe(pd.DataFrame(results), hide_index=True)
+                col1,col2 = st.columns(2)
+                with col1:
+                    if st.button("Confirm!", type='primary', width='stretch'):
+                        try:
+                            add_attendance(attendance_to_log)
+                            st.toast("Successfully logged attendance")
+                            st.session_state.voice_attendance_results = None
+                            st.rerun()
+                        except Exception as e:
+                            st.error("Data inserting error")
+                        
+                with col2:
+                    if st.button("Discard", type='tertiary', width='stretch'):
+                        st.session_state.voice_attendance_results = None
+                        st.rerun()
+
+
+
