@@ -29,7 +29,7 @@ def create_subject(teacher_id):
 
 @st.dialog("Share Class Link")
 def share_subject(subject_name, subject_code):
-    app_domain = "http://localhost:8502/"
+    app_domain = "ai-attendance.streamlit.app"
     join_url = f"{app_domain}?join-code={subject_code}"
     st.header("Scan to Join")
     qr = segno.make(join_url)

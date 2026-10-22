@@ -1,5 +1,6 @@
+streamlit
 git+https://github.com/ageitgey/face_recognition_models
-numpy
+numpy>=2.0.0
 pandas
 scikit-learn
 dlib-bin
@@ -8,6 +9,5 @@ supabase
 bcrypt
 segno
 pillow
-streamlit
 librosa
 resemblyzer
