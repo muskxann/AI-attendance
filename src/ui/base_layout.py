@@ -4,7 +4,7 @@ def background_home():
     st.markdown("""
         <style>
             .stApp{
-            background: #cc94bb;
+            background: #ceb7e1;
             }
 
         </style>
